@@ -22,61 +22,105 @@ namespace Personal_Pomodoro
     public partial class MainWindow : Window
     {
         ToDo w = new ToDo();
-        private int time = 3600;
+        TimerControl y = new TimerControl();
+        int time = 0;
+        int count = 0;
+
+
         private DispatcherTimer Timer;
-        int breaks = 0;
+        //int breaks = 0;
         public MainWindow()
         {
             InitializeComponent();
-            Timer = new DispatcherTimer();
-            Timer.Interval = new TimeSpan(0, 0, 1);
-            Timer.Tick += Timer_Tick;
-            
-        }
+            //time = y.TimeDecider();
 
-        void Timer_Tick(object sender, EventArgs e)
+    }
+
+    void Timer_Tick(object sender, EventArgs e)
         {
-            if(time>0)
-            {
-                if (time <= 10)
+            
+                if (time > 0)
                 {
-                    if(time%2==0)
+                    if (time <= 10)
                     {
-                        CountDown.Foreground = Brushes.BlueViolet;
+                        if (time % 2 == 0)
+                        {
+                            CountDown.Foreground = Brushes.BlueViolet;
+                        }
+                        else
+                        {
+                            CountDown.Foreground = Brushes.Black;
+                        }
+                        time--;
+                        CountDown.Text = string.Format("{0:00}:{1:00}:{2:00}", time / 3600, (time / 60) % 60, time % 60);
                     }
                     else
                     {
-                        CountDown.Foreground = Brushes.Black;
+                        time--;
+                        CountDown.Text = string.Format("{0:00}:{1:00}:{2:00}", time / 3600, (time / 60) % 60, time % 60);
                     }
-                    time--;
-                    CountDown.Text = string.Format("{0:00}:{1:00}:{2:00}", time / 3600, (time / 60) % 60, time % 60);
-                } else
-                {
-                    time--;
-                    CountDown.Text = string.Format("{0:00}:{1:00}:{2:00}", time / 3600, (time / 60) % 60, time % 60);
                 }
-            } else
-            {
-                Timer.Stop();
-            }
+                else
+                {
+                    Timer.Stop();
+                    currentTask.Text = "Time for a break";
+                    count = 0;
+                    finishedPoms.Text = "You have finished " + y.breaks + " Pomodoro(s) today!";
+                if (w.Task.Count == 0)
+                    {
+                        CountDown.Text = "00:00:00";
+                        MessageBox.Show("There are no more tasks in list. Good work today!");
+                    }
+                }
+            
+            
         }
 
         private void Start_Button_Click(object sender, RoutedEventArgs e)
         {
-            Timer.Start();
-            currentTask.Text = w.CurrentTask();
+            if (count == 0)
+            {
+                Timer = new DispatcherTimer();
+                Timer.Interval = new TimeSpan(0, 0, 1);
+                Timer.Tick += Timer_Tick;
+                Timer.Start();
+                currentTask.Text = w.CurrentTask();
+                listOfToDo.ItemsSource = null;
+                nrOfTimesToDo.ItemsSource = null;
+                listOfToDo.ItemsSource = w.taskList();
+                nrOfTimesToDo.ItemsSource = w.numberList();
+                time = y.TimeDecider();
+                count++;
+            }
+            
+            
+            else
+            {
+                Timer.Start();
+
+            }
+         
+
         }
 
-     
+
         private void Stop_Button_Click(object sender, RoutedEventArgs e)
         {
             Timer.Stop();
-
         }
         //added the ability to add new things to the list of items currently in the listbox
         private void addTaskButton_Click(object sender, RoutedEventArgs e)
         {
-            w.addToList(addTask.Text, Int32.Parse(nrOfTask.Text));
+
+            try
+            {
+                w.addToList(addTask.Text, Int32.Parse(nrOfTask.Text));
+            }
+            catch (Exception)
+            {
+
+                MessageBox.Show("Please make sure you enter a valid number into number box.");
+            }
             listOfToDo.ItemsSource = null;
             nrOfTimesToDo.ItemsSource = null;
             listOfToDo.ItemsSource = w.taskList();
@@ -85,8 +129,9 @@ namespace Personal_Pomodoro
 
         private void Reset_Button_Click(object sender, RoutedEventArgs e)
         {
-            breaks++;
-            finishedPoms.Text = "You have finished " + breaks + " Pomodoro(s) today!";
+            Timer.Start();
+            time = y.TimeDecider();
+            
         }
     }
 }

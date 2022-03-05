@@ -8,9 +8,10 @@ namespace Personal_Pomodoro
     {
         //List<Tuple<string, int>> ts { get; set; }
 
-        List<string> Task = new List<string>();
-        List<int> Amount = new List<int>();
+        public List<string> Task = new List<string>();
+        public List<int> Amount = new List<int>();
         int a = 0;
+    
         public ToDo()
         {
 
@@ -27,25 +28,72 @@ namespace Personal_Pomodoro
         }
         public string CurrentTask()
         {
-            string currentTask = Task[a];
-            if(Task[a +1] == null)
+            string currentTask = "";
+            try
             {
-                a = 0;
-            } else
-            {
-                a++;
+                
+                if (Task[a] == Task[Task.Count - 1])
+                {
+
+                    a = 0;
+                    NumberForTask();
+                    currentTask = Task[a];
+
+
+                }
+                else
+                {
+                    a = 0;
+                    currentTask = Task[a];
+                    NumberForTask();
+                   // a++;
+
+                }
+                if (Amount[a] == 0)
+                {
+                    currentTask = Task[a];
+                    Amount.Remove(Amount[a]);
+                    Task.Remove(Task[a]);
+                    a = 0;
+
+
+
+                }
+
+                return currentTask;
 
             }
+            catch (Exception)
+            {
+                return currentTask = " ";
+               
+            }
 
-            NumberForTask();
 
-            return currentTask;
         }
 
         public int NumberForTask()
         {
-            Amount[a]--;
-            return Amount[a];
+
+            try
+            {
+                Amount[a] = Amount[a] - 1;
+                if (Amount[a] == 0)
+                {
+                    Amount.Remove(Amount[a]);
+                    Task.Remove(Task[a]);
+                    a = 0;
+                }
+            
+                return Amount[a];
+
+            }
+            catch (Exception)
+            {
+
+                return 0;
+            }
+           
         }
 
         public void addToList(string task, int nr)
